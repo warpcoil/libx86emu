@@ -37,6 +37,10 @@
 #include <sys/io.h>
 #endif
 
+#if defined (__EMSCRIPTEN__)
+#include "sys/io.h"
+#endif
+
 #define PERM16(a)	((a) + ((a) << 8))
 #define PERM32(a)	(PERM16(a) + (PERM16(a) << 16))
 
