@@ -8,6 +8,8 @@ GITDEPS := $(shell [ -d .git ] && echo .git/HEAD .git/refs/heads .git/refs/tags)
 VERSION := $(shell $(GIT2LOG) --version VERSION ; cat VERSION)
 BRANCH  := $(shell [ -d .git ] && git branch | perl -ne 'print $$_ if s/^\*\s*//')
 PREFIX  := libx86emu-$(VERSION)
+MKDIR	:= mkdir -p
+DESTDIR	:= dist
 
 MAJOR_VERSION := $(shell $(GIT2LOG) --version VERSION ; cut -d . -f 1 VERSION)
 
@@ -15,7 +17,6 @@ CC	= emcc
 CFLAGS	= -s SIDE_MODULE=1 -g -O2 -fPIC -fvisibility=hidden -fomit-frame-pointer -Wall
 LDFLAGS = -s SIDE_MODULE=1 --no-entry
 
-LIBDIR = /usr/lib$(shell ldd /bin/sh | grep -q /lib64/ && echo 64)
 LIBX86	= libx86emu
 
 CFILES	= $(wildcard *.c)
@@ -37,8 +38,9 @@ changelog: $(GITDEPS)
 shared: $(LIB_NAME)
 
 install: shared
-	install -D $(LIB_NAME) $(DESTDIR)$(LIBDIR)/$(LIB_NAME)
-	install -m 644 -D include/x86emu.h $(DESTDIR)/usr/include/x86emu.h
+	$(MKDIR) dist
+	install -D $(LIB_NAME) $(DESTDIR)/$(LIB_NAME)
+	install -m 644 -D include/x86emu.h $(DESTDIR)/x86emu.h
 
 $(LIB_NAME): .depend $(OBJS)
 	$(CC) -shared $(OBJS) -o $(LIB_NAME) $(LDFLAGS)
